@@ -146,7 +146,7 @@ Not implemented, so not promised: automatic deletion of old data (the Privacy Po
 This work adds `Order.termsAcceptedAt` (migration `20261023120000_add_terms_accepted_at`). Apply it to **every existing database, staging included, before deploying the new code**, because the new code writes that column:
 
 ```bash
-npm run db:migrate        # prisma migrate deploy, using DIRECT_URL
+npm run db:migrate        # prisma migrate deploy, using DATABASE_URL_UNPOOLED
 ```
 
 The migration only adds a nullable column, so it is safe to run while the old code is live. Orders created before it have no `termsAcceptedAt`.

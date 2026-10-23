@@ -12,6 +12,14 @@ export const adminStrings = {
     logout: "Log out",
     mainNav: "Admin sections",
   },
+  launch: {
+    title: "Launch checklist",
+    intro: "Finish these before you submit the website to Razorpay. This list shrinks as you fix things.",
+    required: "required",
+    recommended: "recommended",
+    summaryRequired: (n: number) => (n === 1 ? "1 thing to finish" : `${n} things to finish`),
+    summaryRecommended: (n: number) => (n === 1 ? "1 suggestion" : `${n} suggestions`),
+  },
   login: {
     title: "Staff login",
     email: "Email",

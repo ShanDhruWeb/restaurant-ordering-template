@@ -1,4 +1,7 @@
-// Uptime check: GET /api/health -> { ok, db, razorpayMode, version }. No secrets.
+// Uptime check: GET /api/health -> { ok, db, razorpayMode, complianceReady, version }. No secrets.
+// complianceReady comes from restaurant.config.ts only (see src/lib/compliance.ts).
+import { config } from "@/config";
+import { isComplianceReady } from "@/lib/compliance";
 import { prisma } from "@/lib/db";
 import { getEnv } from "@/lib/env";
 import { route } from "@/lib/http";
@@ -22,5 +25,8 @@ export const GET = route("health", async () => {
     razorpayMode = "misconfigured";
   }
   const ok = db && razorpayMode !== "misconfigured";
-  return Response.json({ ok, db, razorpayMode, version: pkg.version }, { status: ok ? 200 : 503 });
+  return Response.json(
+    { ok, db, razorpayMode, complianceReady: isComplianceReady(config), version: pkg.version },
+    { status: ok ? 200 : 503 },
+  );
 });

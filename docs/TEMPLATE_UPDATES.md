@@ -28,6 +28,10 @@ git merge template/main --allow-unrelated-histories
 
 Expect conflicts in the files above on this first merge: keep the client's version (`git checkout --ours restaurant.config.ts public/restaurant prisma/menu.json`), keep the template's version of everything else, then commit.
 
+## When an update changes the config
+
+Some updates add required fields to `restaurant.config.ts`. The app then refuses to start and lists the missing fields, so you find out at once. The Razorpay website-review update (see CHANGELOG, "Unreleased") needs, in `legal`: `entityType`, `registeredAddress`, `grievanceContact`, `jurisdictionCity` and `policiesEffectiveDate`; it also adds optional `payments` and `policies` blocks and replaces the old public "template text" notice with the admin Launch checklist. It adds a database column too: run `npm run db:migrate` on every database (staging included) **before** deploying the update.
+
 ## Each update
 
 ```bash

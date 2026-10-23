@@ -68,3 +68,29 @@ One line per decision, with the reason. Newest at the bottom of each section.
 - **Phone numbers in the database are 10 digits**; Razorpay prefill gets `+91` added.
 - **Admin pages use soft deletes** for categories and items, so old orders keep their links. Order lines also snapshot name, price and veg flag.
 - **Kitchen tickets print through the browser** (`window.print()` with a print-only block); no printer integration.
+
+## Razorpay website verification (23 Oct 2026)
+
+Checked against [Business website details](https://razorpay.com/docs/payments/dashboard/account-settings/business-website-details/), the [Dashboard FAQ](https://razorpay.com/docs/payments/dashboard/faqs.md) and the [Standard Checkout options](https://razorpay.com/docs/payments/payment-gateway/web-integration/standard/build-integration.md).
+
+- **The brief and the docs agree on the page list.** New website: Shipping, Contact us, Pricing, Terms, Privacy, Cancellation and Refunds, plus a sample invoice (PNG, JPG, PDF). Updates and additional websites: About us, Contact us, Pricing, Terms, Privacy, Refunds (no shipping policy). We ship all seven pages either way.
+- **What the docs add to the brief:** additional websites are only offered for the e-commerce category (up to five), need a written reason of at least 50 words, and are reviewed by hand. The FAQ splits approval into automated checks (3 to 5 minutes) and an agent review (24 to 48 hours). The brand name must be at least 80% similar to the company name or domain. The page we fetched was Razorpay's US-region rendering (it lists India among its regions), so India's flow may be worded slightly differently.
+- **Checkout `name`** is documented as "Your Business/Enterprise name shown on the Checkout form" and is mandatory. We set it from `payments.checkoutDisplayName`. That is the only payment-code change.
+- **The billing label** on Razorpay's emails to customers is a dashboard setting (brand name), not an API option, so the app cannot set it. COMPLIANCE.md tells the owner to set it to the same text.
+- **Name similarity** is a stand-in (Levenshtein ratio on lower-cased letters and digits, against the legal name, the legal name without "Pvt Ltd" and similar, and the domain label). Razorpay does not publish its algorithm, so the check only warns.
+
+### Product decisions for this work
+
+- **One reader of business details: `src/lib/identity.ts`.** `tests/unit/identityGuard.test.ts` fails if anything else under `src` reads `config.restaurant/legal/payments/policies`, imports the config file, or hard-codes the demo values.
+- **Defaults are resolved once, in the zod schema.** `legal.tradeName` defaults to `restaurant.name`; `legal.phone`, `legal.email` and `legal.operatingAddress` default to the restaurant's; `payments.checkoutDisplayName` defaults to the trade name. The rest of the code never sees `undefined`.
+- **Required legal fields in the schema** (`entityType`, `registeredAddress`, `grievanceContact`, `jurisdictionCity`, `policiesEffectiveDate`): a restaurant that forgets one fails at start-up with a path-by-path message instead of shipping empty policy text. Forks of the template must add them (see TEMPLATE_UPDATES.md).
+- **The public "template text" banner is gone.** The reminder lives in the admin Launch checklist until `legal.policiesReviewed` is true. `complianceReady` is false until then.
+- **Policy text is built by pure functions of the identity** (`buildTerms` and friends in `src/content/policies.ts`), so a test can build a completely different restaurant and prove that no demo value leaks and every config value is used.
+- **`/refunds` stays the canonical refund URL** (it already existed). `/cancellation-and-refunds` and `/refund-policy` redirect to it with 308, and `/delivery-policy` redirects to `/shipping`. The eight public pages and the footer list come from one array, `PUBLIC_PAGES` in `src/lib/seo.ts`.
+- **`/checkout` and `/order/...` keep `noindex` and stay disallowed in `robots.txt`.** They are customer-specific pages, not part of the public site Razorpay reviews. All eight public pages carry no `noindex`.
+- **Per-page `openGraph` must repeat the shared fields.** Next.js replaces the layout's `openGraph` object instead of merging it. The compliance crawler found `og:site_name` missing on its first run, so `pageMetadata` repeats `siteName`, `images` and `locale`.
+- **Consent is enforced in `createOrder`, not only in the form.** `termsAccepted` must be exactly `true`, otherwise the API answers `400 consent_required` and creates no order. `termsAcceptedAt` is the server's clock. The column is nullable so existing rows stay valid, and the migration only adds a column.
+- **The receipt is a plain data object (`src/lib/receipt.ts`)** drawn by both the page and the PDF builder, so the sample invoice cannot drift from the real receipt. It is built from the public order projection, which has no phone number or Razorpay ids.
+- **The sample invoice uses `pdf-lib`** (pure JavaScript, no browser). Standard PDF fonts cannot draw the rupee sign, so the PDF prints "Rs.".
+- **The compliance crawler places one unpaid order by default** to reach `/order/[id]` and the receipt (the brief requires footer checks on both). It is documented, expires by itself, and `--no-order` skips it. `complianceReady: false` is a WARN, not a FAIL, so the demo build can pass; placeholder text on live pages is a FAIL.
+- **Prices are shown inclusive of tax and no GST breakup is calculated** (unchanged). The receipt says so and is not a tax invoice.

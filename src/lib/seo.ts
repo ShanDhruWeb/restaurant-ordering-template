@@ -77,6 +77,15 @@ export function pageMetadata(path: string): Metadata {
     title: page.title,
     description,
     alternates: { canonical: url },
-    openGraph: { title: `${page.title} | ${id.tradeName}`, description, url },
+    // Next.js replaces the layout's openGraph object instead of merging it, so repeat the shared fields.
+    openGraph: {
+      type: "website",
+      siteName: id.tradeName,
+      locale: "en_IN",
+      title: `${page.title} | ${id.tradeName}`,
+      description,
+      url,
+      images: [{ url: id.ogImage, width: 1200, height: 630 }],
+    },
   };
 }

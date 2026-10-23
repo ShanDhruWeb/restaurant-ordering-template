@@ -66,6 +66,16 @@ Note from Razorpay: in **test** mode, cancelling a UPI payment ends up as a _suc
 - [ ] One real ₹20 order paid with your own UPI reaches the board.
 - [ ] Refund it from the live dashboard; the order shows Refunded.
 
+## G. Razorpay website review
+
+1. Run `npm run compliance -- <the deployed URL>` against staging (and again against the final domain). **Every check must pass**; read each WARN. It places one unpaid throw-away order unless you add `--no-order`.
+2. Confirm the consent box: on checkout the **Pay** button is disabled until "I agree to the Terms and Conditions, Privacy Policy and Cancellation and Refund Policy" is ticked, and all three links open in a new tab.
+3. Pay a test order, open **View receipt** on the tracking page, and check the receipt shows no Razorpay id or phone number.
+4. `npm run sample-invoice` and open `out/sample-invoice.pdf`.
+5. `/api/health` shows `complianceReady`; it is `false` until the config has no demo values and `legal.policiesReviewed` is `true`.
+
+The consent column `Order.termsAcceptedAt` comes from migration `20261023120000_add_terms_accepted_at`. **Apply it to every existing database, staging included, with `npm run db:migrate` before the new code is deployed.** Orders created without consent are rejected by the API (`consent_required`).
+
 ## Automated tests
 
-`npm run check` runs about 240 unit and integration tests. Integration tests need `DATABASE_URL_TEST` (a separate, disposable database; they wipe it). They cover: price tampering, bad quantities, sold-out items, closed restaurant, 10 simultaneous payment confirmations, amount mismatch, late payments, webhook signature/dedupe/5xx-on-database-error, payment without any browser callback, no data leaks on the public order endpoint, Razorpay order reuse on retry, staff login, CSRF, audit log, and more. They do **not** talk to the real Razorpay; the checklist above is how that is verified.
+`npm run check` runs about 360 unit and integration tests (the integration ones need a database, see below). Integration tests need `DATABASE_URL_TEST` (a separate, disposable database; they wipe it). They cover: price tampering, bad quantities, sold-out items, closed restaurant, 10 simultaneous payment confirmations, amount mismatch, late payments, webhook signature/dedupe/5xx-on-database-error, payment without any browser callback, no data leaks on the public order endpoint, Razorpay order reuse on retry, staff login, CSRF, audit log, and more. They do **not** talk to the real Razorpay; the checklist above is how that is verified.

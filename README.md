@@ -25,21 +25,23 @@ In mock mode a "Mock payment" sheet replaces Razorpay Checkout. It can simulate 
 
 ## Scripts
 
-| Command                  | What it does                                                                                                    |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------- |
-| `npm run dev`            | Local development server                                                                                        |
-| `npm run check`          | Typecheck, lint, format check, tests, production build. Must pass before every merge.                           |
-| `npm test`               | Tests only. Integration tests need `DATABASE_URL_TEST` (a separate, disposable database).                       |
-| `npm run db:migrate`     | Apply database migrations (`prisma migrate deploy`)                                                             |
-| `npm run db:migrate:dev` | Create a new migration after editing `prisma/schema.prisma` (developers only)                                   |
-| `npm run db:seed`        | Add missing menu items from `prisma/menu.json`. Never overwrites prices staff changed. `-- --force` overwrites. |
-| `npm run create-admin`   | Create a staff login, or reset a password (logs that account out everywhere)                                    |
-| `npm run reconcile`      | Check unpaid orders against Razorpay and expire stale ones (same as the cron job)                               |
+| Command                       | What it does                                                                                                                                            |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`                 | Local development server                                                                                                                                |
+| `npm run check`               | Typecheck, lint, format check, tests, production build. Must pass before every merge.                                                                   |
+| `npm test`                    | Tests only. Integration tests need `DATABASE_URL_TEST` (a separate, disposable database).                                                               |
+| `npm run db:migrate`          | Apply database migrations (`prisma migrate deploy`)                                                                                                     |
+| `npm run db:migrate:dev`      | Create a new migration after editing `prisma/schema.prisma` (developers only)                                                                           |
+| `npm run db:seed`             | Add missing menu items from `prisma/menu.json`. Never overwrites prices staff changed. `-- --force` overwrites.                                         |
+| `npm run create-admin`        | Create a staff login, or reset a password (logs that account out everywhere)                                                                            |
+| `npm run reconcile`           | Check unpaid orders against Razorpay and expire stale ones (same as the cron job)                                                                       |
+| `npm run compliance -- <url>` | Crawl a running site like Razorpay's reviewer and print PASS/FAIL (exit 1 on failure). `--no-order` skips the throw-away order. See docs/COMPLIANCE.md. |
+| `npm run sample-invoice`      | Write `out/sample-invoice.pdf`, the sample invoice Razorpay asks for.                                                                                   |
 
 ## Folder map
 
 ```
-restaurant.config.ts    EVERYTHING restaurant-specific: name, address, hours, theme, tables, legal
+restaurant.config.ts    EVERYTHING restaurant-specific: name, address, hours, theme, tables, legal, policies
 public/restaurant/      logo, social image, menu photos
 prisma/menu.json        the starting menu (seed data)
 prisma/schema.prisma    database tables (all money is Int paise)
@@ -70,6 +72,7 @@ More detail: [docs/DECISIONS.md](docs/DECISIONS.md).
 
 ## Documentation
 
+- [docs/COMPLIANCE.md](docs/COMPLIANCE.md): passing Razorpay's website review (pages, config fields, submission steps)
 - [docs/ONBOARDING.md](docs/ONBOARDING.md): launching a new restaurant, step by step
 - [docs/TESTING.md](docs/TESTING.md): pre-launch payment checklist
 - [docs/RUNBOOK.md](docs/RUNBOOK.md): what to do when something breaks

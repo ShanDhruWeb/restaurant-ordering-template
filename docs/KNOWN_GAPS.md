@@ -13,6 +13,18 @@ Things that are not done, not verified, or deliberately left out. Keep this hone
 - **`npm run create-admin`** was tested with piped input (create, reset, short password, mismatch). The hidden-password prompt in a real terminal was not exercised.
 - **Neon specifically.** Migrations, tests and the end-to-end flow ran against a local PostgreSQL 18. The pooled/direct connection split follows Prisma 7's documentation but was not run against Neon's pooler.
 
+## Razorpay website review (this work)
+
+- **Razorpay's real review was not run.** The pages are built from Razorpay's published requirements and checked with our own crawler (`npm run compliance`). Only Razorpay can confirm approval, and its automated checks or agents may want something the docs do not mention.
+- **The policy text has not been read by a lawyer or CA.** It is plain-English template text written from what the software does. `legal.policiesReviewed` stays `false` in the shipped config.
+- **Not a GST tax invoice.** Receipts and the sample invoice do not compute GST or carry invoice numbers in a GST sequence. Each restaurant's CA must say what it needs to issue.
+- **No automatic data deletion.** The Privacy Policy says customers can ask for their data to be deleted or anonymised. Staff must do that by hand in the database; there is no retention job.
+- **The sample-invoice PDF prints "Rs."** instead of the rupee sign (standard PDF fonts have none).
+- **The checkout consent checkbox has no automated browser test** (the project has no browser test runner). The server rule is tested; see the final report for how the button was checked.
+- **The brand-name similarity check is an approximation** of Razorpay's undocumented 80% rule.
+- **Menu photos in the ordering view use `alt=""`** because the dish name is printed next to them. The `/pricing` page uses the dish name as alt text.
+- **The `www` and bare-domain redirect** is a hosting setting and cannot be verified by the app.
+
 ## Deliberately out of scope
 
 - **Automatic GST calculation.** Prices are charged exactly as listed. Restaurants that list prices before tax must include tax in the menu price or handle invoicing outside the app.

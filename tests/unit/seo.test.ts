@@ -49,6 +49,12 @@ describe("page metadata", () => {
     },
   );
 
+  it.each(PUBLIC_PAGES.map((p) => p.path))("%s keeps the Open Graph site name and image", (path) => {
+    const og = pageMetadata(path).openGraph as { siteName?: string; images?: { url: string }[] };
+    expect(og.siteName).toBe(id.tradeName);
+    expect(og.images?.[0]?.url).toBe(id.ogImage);
+  });
+
   it("gives every page a different title and description", () => {
     const metas = PUBLIC_PAGES.map((p) => pageMetadata(p.path));
     expect(new Set(metas.map((m) => m.title)).size).toBe(8);

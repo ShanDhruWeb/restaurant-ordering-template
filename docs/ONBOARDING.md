@@ -24,7 +24,9 @@ Open `restaurant.config.ts` and fill in every field. The app checks the file at 
   - Hours: `days` such as `["mon","tue",…]`, `open` and `close` as 24-hour `"HH:MM"`. A close time earlier than the open time means after midnight (e.g. `"18:00"` to `"01:00"`).
 - `theme.preset`: `"warm"` (terracotta and cream), `"fresh"` (green and white) or `"midnight"` (dark navy and amber). Override single colours in `theme.colours` (hex like `"#B4441F"`), the corner `radius` (`none`/`small`/`medium`/`large`) and `fonts` (any name from `src/config/fonts.ts`). **Check contrast**: run `npm test`; if you add colour overrides, check them at https://webaim.org/resources/contrastchecker/ (text needs 4.5:1).
 - `ordering`: `types` (`dine_in`, `takeaway`), `tables` (a number, or labels like `["A1","A2","Patio 1"]`), `requirePhone`, `notesEnabled`, item limits, `orderExpiryMinutes` (default 15), `pricesIncludeTax` and `taxNote`, `enforceHours`.
-- `legal`: business legal name, `gstin` and `fssai` if available (shown in the footer).
+- `legal`: every field. Copy the business name, type, registered address, GSTIN and FSSAI **exactly** as on the Razorpay application, add the grievance contact, jurisdiction city and policy date, and set `isDemo: false`. [COMPLIANCE.md](COMPLIANCE.md) explains each field.
+- `payments.checkoutDisplayName`: the name shown in Razorpay Checkout (defaults to `legal.tradeName`). It must be at least 80% similar to the legal name or the domain; the app warns if not.
+- `policies`: refund timeline text, cancellation cut-off, preparation time. Leave `deliveryEnabled` false: the software has no delivery flow.
 - `agency`: our name and link for the "Website by" credit; set `showCredit: false` to hide it.
 
 ## 3. Branding files
@@ -76,6 +78,16 @@ Vercel → Project → **Settings → Domains** → add `order.<restaurant>.in`,
 
 Work through **every** item in [TESTING.md](TESTING.md). Do not skip the "pay then close the tab" and "refund" tests.
 
+## 9a. Razorpay website review (before live keys)
+
+Razorpay reviews the website before it releases live keys. Follow [COMPLIANCE.md](COMPLIANCE.md):
+
+1. `npm run compliance -- https://<staging-or-live-site>` shows no FAIL. (Placeholder and demo values in the config fail it by design.)
+2. `npm run sample-invoice` writes `out/sample-invoice.pdf`.
+3. A lawyer or CA has read the policies; then set `legal.policiesReviewed: true` and update `legal.policiesEffectiveDate`.
+4. The domain serves `www` and the bare domain with one redirecting to the other, and `NEXT_PUBLIC_SITE_URL` is the final address.
+5. Submit the URL, the seven page links and the sample invoice in the Razorpay dashboard (steps in COMPLIANCE.md). Approval usually takes 24 to 48 hours.
+
 ## 10. Go live
 
 1. In Vercel, replace the keys with the **live** keys (`rzp_live_…`), set the live webhook secret, and **remove** `ALLOW_TEST_KEYS`. Redeploy. The TEST MODE banner disappears.
@@ -88,6 +100,6 @@ Work through **every** item in [TESTING.md](TESTING.md). Do not skip the "pay th
 - [ ] Kitchen tablet: open `/admin`, log in, tap **Enable sound alerts**, add the page to the home screen, set the tablet to never sleep while charging, volume up.
 - [ ] Show staff: tapping a new order stops the beep; one tap moves it along; ✕ cancels (and that a cancelled paid order must be refunded in Razorpay); the **Accepting orders** switch; the banner message; sold-out toggles in Menu.
 - [ ] Show the owner `/admin/payments` and `/admin/history` (CSV export for accounts).
-- [ ] The restaurant has reviewed and edited the Terms, Privacy and Refund pages (they show a "Template text" notice until you set `legal.policiesReviewed: true` in the config; if the wording must change, edit `src/content/policies.ts`).
+- [ ] A lawyer or CA has read the Terms, Privacy, Cancellation and Refund, and Shipping pages, and `legal.policiesReviewed` is `true`. The admin **Launch checklist** on the Orders screen is empty (or only has suggestions), and `/api/health` shows `"complianceReady": true`.
 - [ ] Add the site to our uptime monitor: `https://order.<restaurant>.in/api/health`.
 - [ ] Record the template version (`package.json` → `version`) and the go-live date in our client list.

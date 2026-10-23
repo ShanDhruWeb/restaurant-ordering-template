@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import QRCode from "qrcode";
-import { config, tableLabels } from "@/config";
+import { tableLabels } from "@/config";
+import { getIdentity } from "@/lib/identity";
 import { adminStrings } from "@/content/adminStrings";
 import { getEnv } from "@/lib/env";
 import { PrintButton } from "./PrintButton";
@@ -47,7 +48,7 @@ export default async function QrPage() {
             key={c.url}
             className="qr-card flex flex-col items-center rounded-card border-2 border-ink bg-surface p-4 text-center"
           >
-            <p className="font-heading text-lg font-bold">{config.restaurant.name}</p>
+            <p className="font-heading text-lg font-bold">{getIdentity().tradeName}</p>
             {/* SVG generated server-side by the qrcode library from our own URL, never user input. */}
             <div className="mt-2 w-full max-w-48" dangerouslySetInnerHTML={{ __html: c.svg }} />
             <figcaption className="mt-2">

@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { config } from "@/config";
+import { getIdentity } from "@/lib/identity";
 
 // Staff pages are never indexed (also sent as an X-Robots-Tag header in next.config.ts).
 export const metadata: Metadata = {
-  title: { default: `Admin | ${config.restaurant.shortName}`, template: `%s | Admin` },
+  title: { default: `Admin | ${getIdentity().shortName}`, template: `%s | Admin` },
   robots: { index: false, follow: false },
 };
 

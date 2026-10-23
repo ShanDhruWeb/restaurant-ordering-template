@@ -10,6 +10,39 @@ const sitePath = z
   .string()
   .regex(/^\/[^\s]*$/, 'must be a path starting with "/", e.g. "/restaurant/logo.svg"');
 
+/** Indian mobile (6-9...) or landline with STD code, with optional +91 / 91 / 0 prefix. */
+export function isIndianPhone(input: string): boolean {
+  let d = input.replace(/[\s\-()]/g, "");
+  if (d.startsWith("+91")) d = d.slice(3);
+  else if (d.length === 12 && d.startsWith("91")) d = d.slice(2);
+  else if (d.length === 11 && d.startsWith("0")) d = d.slice(1);
+  return /^[1-9]\d{9}$/.test(d);
+}
+const indianPhone = z
+  .string()
+  .refine(isIndianPhone, "must be a valid Indian phone number, e.g. +91 98765 43210");
+const pincode = z.string().regex(/^\d{6}$/, "must be a 6-digit Indian pincode");
+const addressSchema = z
+  .object({
+    line1: z.string().min(1),
+    area: z.string().min(1),
+    city: z.string().min(1),
+    pincode,
+  })
+  .strict();
+
+export const ENTITY_TYPES = [
+  "proprietorship",
+  "partnership",
+  "llp",
+  "private_limited",
+  "public_limited",
+  "one_person_company",
+  "trust_or_society",
+  "individual",
+] as const;
+export type EntityType = (typeof ENTITY_TYPES)[number];
+
 export const DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 export type DayKey = (typeof DAY_KEYS)[number];
 
@@ -38,17 +71,10 @@ export const restaurantConfigSchema = z
         slug: z.string().regex(/^[a-z0-9-]+$/, "use lowercase letters, numbers and dashes"),
         tagline: z.string().max(120),
         description: z.string().max(300),
-        phone: z.string().min(8).max(20),
+        phone: indianPhone,
         whatsapp: z.string().min(8).max(20).optional(),
         email: z.email(),
-        address: z
-          .object({
-            line1: z.string().min(1),
-            area: z.string().min(1),
-            city: z.string().min(1),
-            pincode: z.string().regex(/^\d{6}$/, "must be a 6-digit Indian pincode"),
-          })
-          .strict(),
+        address: addressSchema,
         mapsUrl: z.url().optional(),
         hours: z
           .object({
@@ -106,20 +132,67 @@ export const restaurantConfigSchema = z
       .strict(),
     legal: z
       .object({
+        // Exactly as registered, and exactly as given to Razorpay.
         businessLegalName: z.string().min(1),
+        // The public brand. Defaults to restaurant.name.
+        tradeName: z.string().min(1).max(80).optional(),
+        entityType: z.enum(ENTITY_TYPES),
+        registeredAddress: addressSchema,
+        // Where customers collect food. Defaults to restaurant.address.
+        operatingAddress: addressSchema.optional(),
+        // Default to restaurant.phone / restaurant.email.
+        phone: indianPhone.optional(),
+        email: z.email().optional(),
+        grievanceContact: z
+          .object({ name: z.string().min(1), email: z.email(), phone: indianPhone })
+          .strict(),
         gstin: z
           .string()
-          .regex(/^[0-9A-Z]{15}$/, "GSTIN is 15 characters, capital letters and digits")
+          .regex(
+            /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/,
+            "GSTIN is 15 characters, like 27ABCDE1234F1Z5",
+          )
           .optional(),
         fssai: z
           .string()
           .regex(/^\d{14}$/, "FSSAI licence number is 14 digits")
           .optional(),
-        // Set true once the restaurant has read and approved the Terms, Privacy and
-        // Refund pages. Until then those pages show a "template text" notice.
+        jurisdictionCity: z.string().min(1),
+        // ISO date (YYYY-MM-DD) shown as "Last updated" on every policy.
+        policiesEffectiveDate: z.string().refine(isIsoDate, "must be a real date like 2026-10-23"),
+        // Set true only after a lawyer or CA has read the policies. Until then the
+        // admin Launch checklist reminds staff; the public pages show nothing.
         policiesReviewed: z.boolean().default(false),
+        // True only for the fictional demo restaurant.
+        isDemo: z.boolean().default(false),
       })
       .strict(),
+    payments: z
+      .object({
+        // What Razorpay Checkout shows as the business name. Defaults to the trade name.
+        checkoutDisplayName: z.string().min(1).max(80).optional(),
+      })
+      .strict()
+      .prefault({}),
+    policies: z
+      .object({
+        refundTimelineText: z.string().min(1).default("5 to 7 business days, depending on your bank"),
+        cancellationCutoff: z.string().min(1).default("before the kitchen starts preparing your order"),
+        preparationTimeMinutes: z.number().int().min(1).max(240).default(20),
+        deliveryEnabled: z.boolean().default(false),
+        // Only used when deliveryEnabled is true.
+        delivery: z
+          .object({
+            area: z.string().min(1),
+            chargeText: z.string().min(1),
+            timeText: z.string().min(1),
+          })
+          .strict()
+          .optional(),
+        collectionGraceMinutes: z.number().int().min(5).max(240).optional(),
+      })
+      .strict()
+      .prefault({}),
     agency: z
       .object({
         name: z.string().optional(),
@@ -130,7 +203,20 @@ export const restaurantConfigSchema = z
       .strict()
       .default({ showCredit: false }),
   })
-  .strict();
+  .strict()
+  .transform((c) => ({
+    ...c,
+    legal: {
+      ...c.legal,
+      tradeName: c.legal.tradeName ?? c.restaurant.name,
+      operatingAddress: c.legal.operatingAddress ?? c.restaurant.address,
+      phone: c.legal.phone ?? c.restaurant.phone,
+      email: c.legal.email ?? c.restaurant.email,
+    },
+    payments: {
+      checkoutDisplayName: c.payments.checkoutDisplayName ?? c.legal.tradeName ?? c.restaurant.name,
+    },
+  }));
 
 export type RestaurantConfigInput = z.input<typeof restaurantConfigSchema>;
 export type RestaurantConfig = z.output<typeof restaurantConfigSchema>;
@@ -147,7 +233,19 @@ export function parseRestaurantConfig(input: unknown): RestaurantConfig {
       "restaurant.config.ts is invalid:\n  - ordering.tables: dine_in needs at least one table",
     );
   }
+  const { policies } = result.data;
+  if (policies.deliveryEnabled && !policies.delivery) {
+    throw new Error(
+      "restaurant.config.ts is invalid:\n  - policies.delivery: required when policies.deliveryEnabled is true (area, chargeText, timeText)",
+    );
+  }
   return result.data;
+}
+
+function isIsoDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const d = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === value;
 }
 
 /** Helper so restaurant.config.ts gets autocomplete without importing zod. */

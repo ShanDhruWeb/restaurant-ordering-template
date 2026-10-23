@@ -129,6 +129,21 @@ export const strings = {
     keepOpen: "Keep this page open. It updates automatically.",
     saveLink: "Bookmark this page to check your order later.",
   },
+  home: {
+    orderNow: "Order now",
+    openToday: (open: string, close: string) => `Open today, ${open} to ${close}`,
+    closedToday: "Closed today",
+    howTitle: "How it works",
+    how: [
+      "Scan the table QR or open this page",
+      "Choose your items",
+      "Pay securely with UPI or card through Razorpay",
+      "Collect your order or get served at your table",
+    ],
+    paymentMethods:
+      "You can pay by UPI or debit or credit card. The payment window shows every method currently available.",
+    razorpay: "Payments are processed securely by Razorpay.",
+  },
   footer: {
     fssai: (n: string) => `FSSAI Lic. No. ${n}`,
     gstin: (n: string) => `GSTIN ${n}`,

@@ -1,31 +1,32 @@
 import type { Metadata, Viewport } from "next";
 import type { CSSProperties, ReactNode } from "react";
-import { config, theme } from "@/config";
+import { theme } from "@/config";
+import { getIdentity } from "@/lib/identity";
 import { strings } from "@/content/strings";
 import { isTestMode, razorpayModeOrNull } from "@/server/mode";
 import { fontFamily } from "./fonts";
 import "./globals.css";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const id = getIdentity();
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(id.siteUrl),
   title: {
-    default: `${config.restaurant.name}: ${config.restaurant.tagline}`,
-    template: `%s | ${config.restaurant.name}`,
+    default: `${id.tradeName}: ${id.tagline}`,
+    template: `%s | ${id.tradeName}`,
   },
-  description: config.restaurant.description,
-  applicationName: config.restaurant.shortName,
+  description: id.description,
+  applicationName: id.shortName,
   openGraph: {
     type: "website",
-    siteName: config.restaurant.name,
-    title: config.restaurant.name,
-    description: config.restaurant.description,
-    images: [{ url: config.restaurant.ogImage, width: 1200, height: 630 }],
+    siteName: id.tradeName,
+    title: id.tradeName,
+    description: id.description,
+    images: [{ url: id.ogImage, width: 1200, height: 630 }],
     locale: "en_IN",
   },
   twitter: { card: "summary_large_image" },
-  icons: { icon: config.restaurant.logo, apple: config.restaurant.logo },
+  icons: { icon: id.logo, apple: id.logo },
   formatDetection: { telephone: false },
 };
 

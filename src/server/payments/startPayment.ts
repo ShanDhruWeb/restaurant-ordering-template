@@ -2,10 +2,10 @@
 // Every attempt for an order uses the SAME Razorpay order, so whichever attempt
 // the customer finally pays with can always be matched back to our order.
 import "server-only";
-import { config } from "@/config";
 import { prisma } from "@/lib/db";
 import { getEnv } from "@/lib/env";
 import { HttpError } from "@/lib/http";
+import { getIdentity } from "@/lib/identity";
 import { log } from "@/lib/log";
 import { getGateway } from "./gateway";
 import { expireIfStale, reconcileOrder } from "./reconcile";
@@ -94,7 +94,7 @@ export async function startPayment(orderId: string, now = new Date()): Promise<S
     razorpayOrderId,
     amountPaise: order.totalPaise,
     currency: "INR",
-    name: config.restaurant.name,
+    name: getIdentity().checkoutDisplayName,
     description: `Order #${order.dailyNumber}`,
     prefill: { name: order.customerName, contact: order.customerPhone ? `+91${order.customerPhone}` : "" },
   };

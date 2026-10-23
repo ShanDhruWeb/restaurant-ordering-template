@@ -2,7 +2,7 @@
 // company name or the domain name. We do not know Razorpay's exact algorithm,
 // so this is a close, simple stand-in used only to warn early.
 
-/** Lowercase letters and digits only: "Demo Kitchen!" -> "demokitchen". */
+/** Lowercase letters and digits only: "Spice Route!" -> "spiceroute". */
 export function normaliseName(input: string): string {
   return input.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
@@ -41,7 +41,7 @@ export function stripCompanySuffix(name: string): string {
     .trim();
 }
 
-/** "https://www.demokitchen.in" -> "demokitchen". Empty for localhost or invalid URLs. */
+/** "https://www.spiceroute.in" -> "spiceroute". Empty for localhost or invalid URLs. */
 export function domainLabel(siteUrl: string): string {
   try {
     const host = new URL(siteUrl).hostname.replace(/^www\./, "");

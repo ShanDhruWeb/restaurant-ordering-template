@@ -15,7 +15,7 @@ import type { PublicOrder } from "@/server/orders/publicOrder";
 const POLL_MS = 4000;
 const STEPS = ["paid", "preparing", "ready", "completed"] as const;
 
-export function OrderTracker({ initial }: { initial: PublicOrder }) {
+export function OrderTracker({ initial, refundTimeline }: { initial: PublicOrder; refundTimeline: string }) {
   const [order, setOrder] = useState(initial);
   const [payMessage, setPayMessage] = useState<string | null>(null);
   const { pay, busy, mockSheet } = usePayment();
@@ -78,7 +78,7 @@ export function OrderTracker({ initial }: { initial: PublicOrder }) {
         {!done && <LiveStatus live={poll.live} lastUpdated={poll.lastUpdated} />}
       </div>
 
-      <StatusPanel order={order} />
+      <StatusPanel order={order} refundTimeline={refundTimeline} />
 
       {canPay && (
         <div className="mt-4">
@@ -133,15 +133,15 @@ export function OrderTracker({ initial }: { initial: PublicOrder }) {
   );
 }
 
-function StatusPanel({ order }: { order: PublicOrder }) {
+function StatusPanel({ order, refundTimeline }: { order: PublicOrder; refundTimeline: string }) {
   const t = strings.tracking;
   const refundLine =
     order.refundStatus === "needed"
-      ? t.refundNeeded
+      ? t.refundNeeded(refundTimeline)
       : order.refundStatus === "partial"
         ? t.refundPartial
         : order.refundStatus === "refunded"
-          ? t.refunded
+          ? t.refunded(refundTimeline)
           : null;
 
   // Problem states get a single clear message instead of the step tracker.

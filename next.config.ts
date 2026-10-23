@@ -38,6 +38,14 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  // Different Razorpay flows call the same pages by different names.
+  async redirects() {
+    return [
+      { source: "/cancellation-and-refunds", destination: "/refunds", permanent: true },
+      { source: "/refund-policy", destination: "/refunds", permanent: true },
+      { source: "/delivery-policy", destination: "/shipping", permanent: true },
+    ];
+  },
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },

@@ -1,24 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { config } from "@/config";
 import { strings } from "@/content/strings";
-import { formatHHMM } from "@/lib/time";
+import { getIdentity, hoursText } from "@/lib/identity";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: strings.pages.contactTitle };
-
-const ALL_DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
+export const metadata: Metadata = pageMetadata("/contact");
 
 export default function ContactPage() {
-  const r = config.restaurant;
-  const days =
-    r.hours.days.length === 7
-      ? strings.everyDay
-      : ALL_DAYS.filter((d) => r.hours.days.includes(d))
-          .map((d) => strings.days[d])
-          .join(", ");
-  const tel = r.phone.replace(/[^\d+]/g, "");
-  const wa = r.whatsapp?.replace(/\D/g, "");
+  const id = getIdentity();
+  const wa = id.whatsapp?.replace(/\D/g, "");
   const button = "inline-flex h-12 items-center justify-center rounded-pill px-5 font-semibold";
+  const link = "underline underline-offset-4";
+  const label = "text-sm font-semibold text-muted";
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
@@ -26,34 +19,56 @@ export default function ContactPage() {
         ← {strings.pages.goHome}
       </Link>
       <h1 className="mt-2 text-3xl font-bold">{strings.pages.contactTitle}</h1>
+      <p className="mt-2 text-muted">{id.tradeName}</p>
       <dl className="mt-6 space-y-5">
         <div>
-          <dt className="text-sm font-semibold text-muted">{strings.pages.address}</dt>
+          <dt className={label}>{strings.pages.address}</dt>
+          <dd className="mt-1">{id.operatingAddressText}</dd>
+        </div>
+        {id.addressesDiffer && (
+          <div>
+            <dt className={label}>{strings.pages.registeredAddress}</dt>
+            <dd className="mt-1">
+              {id.legalName}, {id.registeredAddressText}
+            </dd>
+          </div>
+        )}
+        <div>
+          <dt className={label}>{strings.pages.hours}</dt>
+          <dd className="mt-1">{hoursText(id)}</dd>
+        </div>
+        <div>
+          <dt className={label}>{strings.pages.phone}</dt>
           <dd className="mt-1">
-            {r.address.line1}, {r.address.area}, {r.address.city} {r.address.pincode}
+            <a href={id.phoneHref} className={link}>
+              {id.phone}
+            </a>
           </dd>
         </div>
         <div>
-          <dt className="text-sm font-semibold text-muted">{strings.pages.hours}</dt>
+          <dt className={label}>{strings.pages.email}</dt>
           <dd className="mt-1">
-            {days}: {formatHHMM(r.hours.open)} to {formatHHMM(r.hours.close)}
+            <a href={id.emailHref} className={link}>
+              {id.email}
+            </a>
           </dd>
         </div>
         <div>
-          <dt className="text-sm font-semibold text-muted">{strings.pages.phone}</dt>
-          <dd className="mt-1">{r.phone}</dd>
-        </div>
-        <div>
-          <dt className="text-sm font-semibold text-muted">{strings.pages.email}</dt>
+          <dt className={label}>{strings.pages.grievance}</dt>
           <dd className="mt-1">
-            <a href={`mailto:${r.email}`} className="underline underline-offset-4">
-              {r.email}
+            {id.grievance.name}:{" "}
+            <a href={id.grievance.emailHref} className={link}>
+              {id.grievance.email}
+            </a>
+            ,{" "}
+            <a href={id.grievance.phoneHref} className={link}>
+              {id.grievance.phone}
             </a>
           </dd>
         </div>
       </dl>
       <div className="mt-8 flex flex-wrap gap-3">
-        <a href={`tel:${tel}`} className={`${button} bg-primary text-on-primary`}>
+        <a href={id.phoneHref} className={`${button} bg-primary text-on-primary`}>
           {strings.common.callUs}
         </a>
         {wa && (
@@ -65,8 +80,8 @@ export default function ContactPage() {
             {strings.common.whatsapp}
           </a>
         )}
-        {r.mapsUrl && (
-          <a href={r.mapsUrl} rel="noopener" className={`${button} border border-line bg-surface`}>
+        {id.mapsUrl && (
+          <a href={id.mapsUrl} rel="noopener" className={`${button} border border-line bg-surface`}>
             {strings.common.directions}
           </a>
         )}

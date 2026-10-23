@@ -1,4 +1,4 @@
-import { config } from "@/config";
+import { canonicalUrl, getIdentity } from "@/lib/identity";
 
 const DAY_NAMES = {
   mon: "Monday",
@@ -12,37 +12,39 @@ const DAY_NAMES = {
 
 /** schema.org Restaurant data for search engines. Built only from config, never user input. */
 export function RestaurantJsonLd() {
-  const r = config.restaurant;
-  const site = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  const id = getIdentity();
+  const a = id.operatingAddress;
   const data = {
     "@context": "https://schema.org",
     "@type": "Restaurant",
-    name: r.name,
-    description: r.description,
-    url: site,
-    telephone: r.phone,
-    email: r.email,
-    image: `${site}${r.ogImage}`,
-    logo: `${site}${r.logo}`,
-    servesCuisine: r.cuisines,
+    name: id.tradeName,
+    legalName: id.legalName,
+    description: id.description,
+    url: id.siteUrl,
+    telephone: id.phone,
+    email: id.email,
+    image: `${id.siteUrl}${id.ogImage}`,
+    logo: `${id.siteUrl}${id.logo}`,
+    servesCuisine: id.cuisines,
     acceptsReservations: false,
-    hasMenu: `${site}/`,
+    hasMenu: canonicalUrl("/pricing", id),
+    ...(id.gstin ? { taxID: id.gstin } : {}),
     address: {
       "@type": "PostalAddress",
-      streetAddress: `${r.address.line1}, ${r.address.area}`,
-      addressLocality: r.address.city,
-      postalCode: r.address.pincode,
+      streetAddress: `${a.line1}, ${a.area}`,
+      addressLocality: a.city,
+      postalCode: a.pincode,
       addressCountry: "IN",
     },
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",
-        dayOfWeek: r.hours.days.map((d) => DAY_NAMES[d]),
-        opens: r.hours.open,
-        closes: r.hours.close,
+        dayOfWeek: id.hours.days.map((d) => DAY_NAMES[d]),
+        opens: id.hours.open,
+        closes: id.hours.close,
       },
     ],
-    sameAs: Object.values(r.socials).filter(Boolean),
+    sameAs: Object.values(id.socials).filter(Boolean),
   };
   // JSON.stringify output with "<" escaped cannot break out of the script tag.
   const json = JSON.stringify(data).replace(/</g, "\u003c");

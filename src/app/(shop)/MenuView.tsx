@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { type ReactNode, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { ItemImage } from "@/components/ItemImage";
 import { QtyStepper } from "@/components/QtyStepper";
 import { VegMark } from "@/components/VegMark";
@@ -22,15 +22,16 @@ interface Props {
     tagline: string;
     logo: string;
     phone: string;
-    area: string;
     open: string;
     close: string;
   };
   limits: { maxQtyPerItem: number; maxItemsPerOrder: number };
   taxNote: string;
+  /** Server-rendered top section shown between the header and the menu. */
+  intro?: ReactNode;
 }
 
-export function MenuView({ initialMenu, tableFromQr, restaurant, limits, taxNote }: Props) {
+export function MenuView({ initialMenu, tableFromQr, restaurant, limits, taxNote, intro }: Props) {
   const cart = useCart();
   const [menu, setMenu] = useState(initialMenu);
   const [query, setQuery] = useState("");
@@ -105,9 +106,6 @@ export function MenuView({ initialMenu, tableFromQr, restaurant, limits, taxNote
             <p className="truncate text-sm text-muted">{restaurant.tagline}</p>
           </div>
         </div>
-        <p className="mt-3 text-sm text-muted">
-          {strings.menu.hours(restaurant.open, restaurant.close)} · {restaurant.area}
-        </p>
         {/* The QR table renders on the server; a table from earlier in the session after hydration. */}
         {(tableFromQr ?? (cart.tableFixed ? cart.table : null)) && (
           <p className="mt-3 inline-block rounded-pill bg-ink px-3 py-1 text-sm font-semibold text-bg">
@@ -128,6 +126,9 @@ export function MenuView({ initialMenu, tableFromQr, restaurant, limits, taxNote
           </p>
         )}
       </header>
+
+      {intro}
+      <div id="menu" className="scroll-mt-2" />
 
       <CategoryNav categories={navCategories}>
         <div className="flex gap-2 px-4 pb-2">

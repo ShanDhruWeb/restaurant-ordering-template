@@ -2,6 +2,7 @@
 // orders" switch and a banner message. Stored in a single Setting row (id = 1).
 import "server-only";
 import { config } from "@/config";
+import { getIdentity } from "@/lib/identity";
 import { prisma } from "@/lib/db";
 import { isWithinHours } from "@/lib/time";
 
@@ -23,7 +24,7 @@ export function orderingStateFrom(
 ): OrderingState {
   const base = { bannerMessage: settings.bannerMessage };
   if (!settings.acceptingOrders) return { ...base, accepting: false, reason: "switched_off" };
-  if (enforceHours && !isWithinHours(config.restaurant.hours, now)) {
+  if (enforceHours && !isWithinHours(getIdentity().hours, now)) {
     return { ...base, accepting: false, reason: "outside_hours" };
   }
   return { ...base, accepting: true, reason: "open" };

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getIdentity } from "@/lib/identity";
 import { getPublicOrder } from "@/server/orders/publicOrder";
 import { OrderTracker } from "./OrderTracker";
 
@@ -11,5 +12,5 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
   if (!/^[a-z0-9]{20,40}$/.test(id)) notFound();
   const order = await getPublicOrder(id);
   if (!order) notFound();
-  return <OrderTracker initial={order} />;
+  return <OrderTracker initial={order} refundTimeline={getIdentity().policies.refundTimelineText} />;
 }

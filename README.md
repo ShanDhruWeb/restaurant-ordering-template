@@ -77,3 +77,7 @@ More detail: [docs/DECISIONS.md](docs/DECISIONS.md).
 - [docs/TEMPLATE_UPDATES.md](docs/TEMPLATE_UPDATES.md): pulling template improvements into a restaurant's repo
 - [docs/DECISIONS.md](docs/DECISIONS.md) and [docs/KNOWN_GAPS.md](docs/KNOWN_GAPS.md)
 - [CHANGELOG.md](CHANGELOG.md): template versions
+
+## License
+
+This project is released under the MIT License. See [LICENSE](LICENSE).

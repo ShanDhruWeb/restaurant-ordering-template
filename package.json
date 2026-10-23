@@ -2,6 +2,7 @@
   "name": "restaurant-ordering-template",
   "version": "1.0.0",
   "private": true,
+  "license": "MIT",
   "description": "Mobile-first menu and ordering website for one restaurant, paid through the restaurant's own Razorpay account.",
   "engines": {
     "node": ">=20.9"

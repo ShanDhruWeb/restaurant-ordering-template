@@ -23,6 +23,10 @@ Things that are not done, not verified, or deliberately left out. Keep this hone
 - **The checkout consent checkbox has no automated browser test** (the project has no browser test runner). The server rule is tested; see the final report for how the button was checked.
 - **The brand-name similarity check is an approximation** of Razorpay's undocumented 80% rule.
 - **Menu photos in the ordering view use `alt=""`** because the dish name is printed next to them. The `/pricing` page uses the dish name as alt text.
+- **Layout was not rendered at 360 px.** The Chrome tooling here would not shrink its window. We checked that the eight public pages have no horizontal overflow when laid out 360 px wide (`scrollWidth` equals 360) and looked at the home page at desktop width; the footer and checkout were not inspected visually at phone width.
+- **Lighthouse was not run** on the new pages (no Lighthouse install here). Accessibility basics were followed (labels, alt text, link text, 44 px targets) but the 95+ target is unmeasured.
+- **The consent button was checked by reading the code and by the API tests**, not clicked in a browser.
+- **Integration tests ran against a throw-away embedded PostgreSQL** (UTF-8), not Neon.
 - **The `www` and bare-domain redirect** is a hosting setting and cannot be verified by the app.
 
 ## Deliberately out of scope

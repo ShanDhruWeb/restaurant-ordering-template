@@ -95,13 +95,35 @@
   }
 }
 
-/* Printing: only the kitchen ticket. */
+/* Printing: hide app chrome; kitchen tickets and QR sheets use .print-only. */
+.print-only {
+  display: none;
+}
 @media print {
+  .print-only {
+    display: block;
+  }
   .no-print {
     display: none !important;
   }
   body {
     background: #fff;
     color: #000;
+  }
+}
+
+/* QR sheets: A4, six cards per page, never split a card across pages. */
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+  .qr-sheet {
+    gap: 8mm;
+  }
+  .qr-card {
+    break-inside: avoid;
+    height: 85mm;
+    border-color: #000;
   }
 }

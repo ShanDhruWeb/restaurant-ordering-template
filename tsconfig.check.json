@@ -1,0 +1,5 @@
+{
+  "//": "Used by `npm run typecheck`. Same as tsconfig.json (which Next.js rewrites) but without .next/dev/types, so a running dev server cannot break the check.",
+  "extends": "./tsconfig.json",
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"]
+}

@@ -11,7 +11,7 @@
     "build": "next build",
     "start": "next start",
     "postinstall": "prisma generate",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit -p tsconfig.check.json",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

@@ -4,3 +4,4 @@ src/generated
 coverage
 package-lock.json
 prisma/migrations
+tsconfig.json

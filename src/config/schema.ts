@@ -115,6 +115,9 @@ export const restaurantConfigSchema = z
           .string()
           .regex(/^\d{14}$/, "FSSAI licence number is 14 digits")
           .optional(),
+        // Set true once the restaurant has read and approved the Terms, Privacy and
+        // Refund pages. Until then those pages show a "template text" notice.
+        policiesReviewed: z.boolean().default(false),
       })
       .strict(),
     agency: z

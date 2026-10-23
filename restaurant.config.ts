@@ -58,6 +58,8 @@ export default defineRestaurantConfig({
     businessLegalName: "Demo Kitchen (fictional business)",
     // gstin: "27ABCDE1234F1Z5",
     // fssai: "11500000000000",
+    // Set to true after the restaurant has reviewed /terms, /privacy and /refunds.
+    policiesReviewed: false,
   },
 
   agency: {

@@ -1,5 +1,5 @@
 // The one Prisma client for the app. Uses the POOLED DATABASE_URL through the pg
-// driver adapter (Prisma 7). Migrations use DIRECT_URL via prisma.config.ts.
+// driver adapter (Prisma 7). Migrations use DATABASE_URL_UNPOOLED via prisma.config.ts.
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
 

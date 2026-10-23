@@ -14,7 +14,7 @@ const emptyToUndefined = (v: unknown) => (v === "" ? undefined : v);
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required (pooled Postgres connection string)"),
-  DIRECT_URL: z.preprocess(emptyToUndefined, z.string().optional()),
+  DATABASE_URL_UNPOOLED: z.preprocess(emptyToUndefined, z.string().optional()),
   RAZORPAY_MOCK: flag,
   RAZORPAY_KEY_ID: z.preprocess(emptyToUndefined, z.string().optional()),
   RAZORPAY_KEY_SECRET: z.preprocess(emptyToUndefined, z.string().optional()),

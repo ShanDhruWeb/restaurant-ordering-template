@@ -9,6 +9,6 @@ export default defineConfig({
   migrations: { path: "prisma/migrations" },
   datasource: {
     // Not using env() here so that `prisma generate` (run on install) works without a database.
-    url: process.env.DIRECT_URL ?? process.env.DATABASE_URL ?? "",
+    url: process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL ?? "",
   },
 });

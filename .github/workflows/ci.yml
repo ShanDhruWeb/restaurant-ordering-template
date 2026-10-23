@@ -21,7 +21,7 @@ jobs:
     env:
       # CI-only throwaway values. Real secrets never go in this file.
       DATABASE_URL: postgresql://test:test@localhost:5432/not_used_in_ci
-      DIRECT_URL: postgresql://test:test@localhost:5432/not_used_in_ci
+      DATABASE_URL_UNPOOLED: postgresql://test:test@localhost:5432/not_used_in_ci
       DATABASE_URL_TEST: postgresql://test:test@localhost:5432/restaurant_test
       RAZORPAY_MOCK: "true"
       SESSION_SECRET: ci-only-session-secret-0123456789abcdef

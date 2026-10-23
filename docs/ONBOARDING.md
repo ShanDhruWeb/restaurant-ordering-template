@@ -41,8 +41,8 @@ After launch, staff edit the menu in `/admin/menu`. Re-running the seed never ov
 
 ## 5. Database
 
-1. Create a Neon project for **this restaurant only** (region: **AWS Asia Pacific (Mumbai)** if offered, otherwise Singapore).
-2. Copy the **pooled** connection string (`-pooler` in the host) as `DATABASE_URL` and the **direct** one as `DIRECT_URL`.
+1. Create a Neon project for **this restaurant only** (region: **AWS Asia Pacific (Singapore)**, `aws-ap-southeast-1`; Neon has no Mumbai region).
+2. Copy the **pooled** connection string (`-pooler` in the host) as `DATABASE_URL` and the **direct** one as `DATABASE_URL_UNPOOLED`.
 3. Locally, with those in `.env`:
    ```bash
    npm run db:migrate
@@ -54,7 +54,7 @@ After launch, staff edit the menu in `/admin/menu`. Re-running the seed never ov
 
 1. Vercel → **Add New → Project** → import the repo.
 2. Set every variable from [ENV.md](ENV.md) (Production environment). Start with the restaurant's **test** keys and `ALLOW_TEST_KEYS=true` while you test.
-3. Function region: `vercel.json` already sets **Mumbai (bom1)**. Keep it near the database.
+3. Function region: `vercel.json` already sets **Singapore (sin1)** in its `regions` field, next to the database. This is the one place to change the function region; Vercel reads it at deploy time, so edit `vercel.json` and redeploy. Keep it in the same region as the database.
 4. Deploy. Open `https://<project>.vercel.app/api/health`. It must show `"ok": true, "db": true`.
 5. Cron: `vercel.json` schedules `/api/cron/reconcile` once a day (the Hobby plan limit). On a Pro plan, change the schedule to every 5 minutes (`*/5 * * * *`). The orders board also runs the same check every minute while it is open, and the tracking page checks each unpaid order, so a daily cron is only a safety net.
 

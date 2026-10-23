@@ -41,6 +41,6 @@ npm run check                   # must pass
 1. Read `CHANGELOG.md` for the new version: it says if there are new config fields, new environment variables or new migrations.
 2. If `npm run check` complains about the config, add the new fields to `restaurant.config.ts`.
 3. Open a pull request, let CI pass, merge, and let Vercel deploy.
-4. Migrations: run `npm run db:migrate` against the production database (with `DIRECT_URL` set) **before** or right after the deploy, as the changelog says.
+4. Migrations: run `npm run db:migrate` against the production database (with `DATABASE_URL_UNPOOLED` set) **before** or right after the deploy, as the changelog says.
 5. Check `/api/health` and place a test order if payments changed.
 6. Update the client list with the new template version.

@@ -13,15 +13,15 @@ export default function setup() {
     return;
   }
   const sameAs = (other: string | undefined) => other && hostAndDb(other) === hostAndDb(testUrl);
-  if (sameAs(process.env.DATABASE_URL) || sameAs(process.env.DIRECT_URL)) {
+  if (sameAs(process.env.DATABASE_URL) || sameAs(process.env.DATABASE_URL_UNPOOLED)) {
     throw new Error(
-      "DATABASE_URL_TEST points at the same database as DATABASE_URL/DIRECT_URL. " +
+      "DATABASE_URL_TEST points at the same database as DATABASE_URL/DATABASE_URL_UNPOOLED. " +
         "Tests wipe every table, so they refuse to run against your dev database.",
     );
   }
   execSync("npx prisma migrate deploy", {
     stdio: "inherit",
-    env: { ...process.env, DIRECT_URL: testUrl, DATABASE_URL: testUrl },
+    env: { ...process.env, DATABASE_URL_UNPOOLED: testUrl, DATABASE_URL: testUrl },
   });
 }
 

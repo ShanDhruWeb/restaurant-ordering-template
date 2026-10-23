@@ -10,7 +10,7 @@ You need Node.js 20.9 or later and a PostgreSQL database (a free [Neon](https://
 
 ```bash
 npm install
-cp .env.example .env          # then fill in DATABASE_URL, DIRECT_URL, SESSION_SECRET, CRON_SECRET
+cp .env.example .env          # then fill in DATABASE_URL, DATABASE_URL_UNPOOLED, SESSION_SECRET, CRON_SECRET
                               # leave RAZORPAY_MOCK="true" for local work
 npm run db:migrate            # create the tables
 npm run db:seed               # load the demo menu from prisma/menu.json

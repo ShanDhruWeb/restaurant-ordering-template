@@ -108,9 +108,10 @@ export function MenuView({ initialMenu, tableFromQr, restaurant, limits, taxNote
         <p className="mt-3 text-sm text-muted">
           {strings.menu.hours(restaurant.open, restaurant.close)} · {restaurant.area}
         </p>
-        {cart.tableFixed && cart.table && (
+        {/* The QR table renders on the server; a table from earlier in the session after hydration. */}
+        {(tableFromQr ?? (cart.tableFixed ? cart.table : null)) && (
           <p className="mt-3 inline-block rounded-pill bg-ink px-3 py-1 text-sm font-semibold text-bg">
-            {strings.common.table(cart.table)}
+            {strings.common.table((tableFromQr ?? cart.table)!)}
           </p>
         )}
         {ordering.bannerMessage && (

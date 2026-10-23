@@ -9,6 +9,9 @@ Things that are not done, not verified, or deliberately left out. Keep this hone
 - **CSP with the real Checkout popup.** The policy allows `*.razorpay.com`, but has not been checked against the live popup (TESTING.md E). If Razorpay needs another domain (e.g. for a specific bank's 3-D Secure page inside the iframe), add it in `next.config.ts`.
 - **Lighthouse** was run locally on a production build (mobile preset): menu performance 92, accessibility 100, best practices 100, SEO 100; checkout performance 94, accessibility 100 (its SEO score of 63 is because checkout is deliberately `noindex`). Not measured on Vercel or a real mid-range phone.
 - **Wake Lock and Web Audio** were exercised in desktop Chrome only, not on a real Android tablet.
+- **Printing** (kitchen tickets and the A4 QR sheet) was checked on screen and in the print CSS, not on a physical printer.
+- **`npm run create-admin`** was tested with piped input (create, reset, short password, mismatch). The hidden-password prompt in a real terminal was not exercised.
+- **Neon specifically.** Migrations, tests and the end-to-end flow ran against a local PostgreSQL 18. The pooled/direct connection split follows Prisma 7's documentation but was not run against Neon's pooler.
 
 ## Deliberately out of scope
 

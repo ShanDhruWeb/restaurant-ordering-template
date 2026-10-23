@@ -18,16 +18,26 @@ const output = new Writable({
 });
 const rl = createInterface({ input: process.stdin, output, terminal: process.stdin.isTTY });
 
-function ask(question: string, hidden = false): Promise<string> {
-  return new Promise((resolve) => {
-    process.stdout.write(question);
-    muted = hidden;
-    rl.question("", (answer) => {
-      muted = false;
-      if (hidden) process.stdout.write("\n");
-      resolve(answer.trim());
-    });
-  });
+// Queue lines so nothing is lost when input arrives faster than the prompts
+// (e.g. when answers are piped in).
+const lines: string[] = [];
+const waiting: ((line: string) => void)[] = [];
+rl.on("line", (line) => {
+  const next = waiting.shift();
+  if (next) next(line);
+  else lines.push(line);
+});
+rl.on("close", () => {
+  for (const w of waiting.splice(0)) w("");
+});
+
+async function ask(question: string, hidden = false): Promise<string> {
+  process.stdout.write(question);
+  muted = hidden;
+  const answer = lines.length > 0 ? lines.shift()! : await new Promise<string>((r) => waiting.push(r));
+  muted = false;
+  if (hidden) process.stdout.write("\n");
+  return answer.trim();
 }
 
 async function main() {

@@ -67,7 +67,7 @@ export function CheckoutForm({ types, tables, requirePhone, notesEnabled, taxNot
 
   if (!cart.hydrated) {
     return (
-      <main className="mx-auto max-w-xl space-y-4 px-4 py-6" aria-busy="true">
+      <main className="mx-auto min-h-[85dvh] max-w-xl space-y-4 px-4 py-6" aria-busy="true">
         <div className="skeleton h-8 w-40 rounded-card" />
         <div className="skeleton h-40 rounded-card" />
         <div className="skeleton h-56 rounded-card" />
@@ -77,7 +77,7 @@ export function CheckoutForm({ types, tables, requirePhone, notesEnabled, taxNot
 
   if (cart.lines.length === 0) {
     return (
-      <main className="mx-auto max-w-xl px-4 py-16 text-center">
+      <main className="mx-auto min-h-[85dvh] max-w-xl px-4 py-16 text-center">
         <h1 className="text-2xl font-bold">{strings.cart.yourOrder}</h1>
         <p className="mt-3 text-muted">{strings.cart.empty}</p>
         <Link
@@ -207,7 +207,7 @@ export function CheckoutForm({ types, tables, requirePhone, notesEnabled, taxNot
   const field = "mt-1 h-12 w-full rounded-card border border-line bg-surface px-3 text-base";
 
   return (
-    <main className="mx-auto max-w-xl px-4 pt-4 pb-8">
+    <main className="mx-auto min-h-[85dvh] max-w-xl px-4 pt-4 pb-8">
       <div className="flex items-center gap-2">
         <Link
           href={cart.tableFixed && cart.table ? `/?t=${encodeURIComponent(cart.table)}` : "/"}

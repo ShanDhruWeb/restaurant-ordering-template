@@ -235,17 +235,23 @@ function MenuRow(props: {
   const { item, quantity, max, canOrder, onChange } = props;
   const unavailable = !item.isAvailable;
   return (
-    <li className={`flex gap-3 py-4 ${unavailable ? "opacity-60" : ""}`}>
+    <li className="flex gap-3 py-4">
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <VegMark isVeg={item.isVeg} />
-          <h3 className="font-body text-base leading-snug font-semibold">{item.name}</h3>
+          <h3 className={`font-body text-base leading-snug font-semibold ${unavailable ? "text-muted" : ""}`}>
+            {item.name}
+          </h3>
         </div>
         <p className="mt-1 font-semibold">{formatRupees(item.pricePaise)}</p>
         {item.description && <p className="mt-1 line-clamp-3 text-sm text-muted">{item.description}</p>}
       </div>
       <div className="flex w-28 shrink-0 flex-col items-center">
-        <ItemImage src={item.imagePath} name={item.name} className="h-24 w-28 rounded-card" />
+        <ItemImage
+          src={item.imagePath}
+          name={item.name}
+          className={`h-24 w-28 rounded-card ${unavailable ? "opacity-50 grayscale" : ""}`}
+        />
         <div className="-mt-5">
           {unavailable ? (
             <span className="inline-flex h-11 items-center rounded-pill border border-line bg-surface px-3 text-sm font-semibold text-muted">

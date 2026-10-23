@@ -159,7 +159,6 @@ export const strings = {
     phone: "Phone",
     email: "Email",
     hours: "Opening hours",
-    templateNotice: "Template text: the restaurant must review this page before launch.",
     notFoundTitle: "Page not found",
     notFoundBody: "The page you are looking for does not exist.",
     goHome: "Go to the menu",

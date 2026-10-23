@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { config } from "@/config";
 import { strings } from "@/content/strings";
 import type { Policy } from "@/content/policies";
 
@@ -10,14 +9,7 @@ export function PolicyPage({ policy }: { policy: Policy }) {
         ← {strings.pages.goHome}
       </Link>
       <h1 className="mt-2 text-3xl font-bold">{policy.title}</h1>
-      {!config.legal.policiesReviewed && (
-        <p
-          role="note"
-          className="mt-4 rounded-card border-2 border-dashed border-line bg-tint px-3 py-2 text-sm font-semibold"
-        >
-          {strings.pages.templateNotice}
-        </p>
-      )}
+      {policy.lastUpdated && <p className="mt-1 text-sm text-muted">{policy.lastUpdated}</p>}
       {policy.sections.map((s) => (
         <section key={s.heading} className="mt-6">
           <h2 className="text-xl font-bold">{s.heading}</h2>

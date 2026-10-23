@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { PolicyPage } from "@/components/PolicyPage";
-import { refunds } from "@/content/policies";
+import { buildRefunds } from "@/content/policies";
+import { getIdentity } from "@/lib/identity";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: refunds.title };
+export const metadata: Metadata = pageMetadata("/refunds");
 
 export default function Page() {
-  return <PolicyPage policy={refunds} />;
+  return <PolicyPage policy={buildRefunds(getIdentity())} />;
 }

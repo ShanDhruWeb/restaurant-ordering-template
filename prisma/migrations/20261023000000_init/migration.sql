@@ -102,6 +102,7 @@ CREATE TABLE "Payment" (
     "status" "PaymentStatus" NOT NULL,
     "method" TEXT,
     "failureReason" TEXT,
+    "refundedPaise" INTEGER NOT NULL DEFAULT 0,
     "source" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

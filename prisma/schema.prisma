@@ -144,6 +144,8 @@ model Payment {
   status            PaymentStatus
   method            String?
   failureReason     String?
+  // Total refunded on this payment so far, from Razorpay refund webhooks.
+  refundedPaise     Int           @default(0)
   // Which path told us first: verify | webhook | reconcile
   source            String
   createdAt         DateTime      @default(now())

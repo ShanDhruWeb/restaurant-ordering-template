@@ -49,6 +49,7 @@ describe("public routes", () => {
     for (const page of PUBLIC_PAGES) expect(routes).toContain(page.path);
     expect(routes).toContain("/checkout");
     expect(routes).toContain("/order/[id]");
+    expect(routes).toContain("/order/[id]/receipt");
   });
 
   it("every public route is covered by a layout that renders the footer", () => {

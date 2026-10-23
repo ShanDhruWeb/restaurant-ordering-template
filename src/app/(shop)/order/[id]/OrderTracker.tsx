@@ -119,6 +119,13 @@ export function OrderTracker({ initial, refundTimeline }: { initial: PublicOrder
         </div>
       </section>
 
+      {order.paymentStatus === "paid" && (
+        <p className="mt-4 text-center">
+          <Link href={`/order/${order.id}/receipt`} className="inline-block py-2 font-semibold underline">
+            {strings.receipt.viewReceipt}
+          </Link>
+        </p>
+      )}
       <p className="mt-4 text-center text-sm text-muted">{done ? t.saveLink : t.keepOpen}</p>
       <div className="mt-4 text-center">
         <Link

@@ -1,0 +1,227 @@
+// Data model for ONE restaurant. All money is Int paise (100 paise = 1 rupee).
+// Connection strings live in prisma.config.ts (CLI) and src/lib/db.ts (app).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Category {
+  id        String     @id @default(cuid())
+  name      String
+  sortOrder Int        @default(0)
+  isActive  Boolean    @default(true)
+  // Stable key from prisma/menu.json so re-seeding never duplicates rows.
+  seedKey   String?    @unique
+  deletedAt DateTime?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  items     MenuItem[]
+}
+
+model MenuItem {
+  id          String      @id @default(cuid())
+  categoryId  String
+  category    Category    @relation(fields: [categoryId], references: [id])
+  name        String
+  description String      @default("")
+  pricePaise  Int
+  isVeg       Boolean     @default(true)
+  imagePath   String?
+  isAvailable Boolean     @default(true)
+  sortOrder   Int         @default(0)
+  seedKey     String?     @unique
+  // Soft delete: past orders keep pointing at the row, the menu hides it.
+  deletedAt   DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  orderItems  OrderItem[]
+
+  @@index([categoryId])
+}
+
+enum OrderType {
+  dine_in
+  takeaway
+}
+
+enum OrderStatus {
+  pending_payment
+  paid
+  preparing
+  ready
+  completed
+  cancelled
+  expired
+}
+
+enum OrderPaymentStatus {
+  unpaid
+  failed // last attempt failed; the customer can retry on the same order
+  paid
+}
+
+enum RefundStatus {
+  none
+  needed
+  partial
+  refunded
+}
+
+model Order {
+  id              String             @id @default(cuid())
+  dailyNumber     Int
+  // IST calendar date (YYYY-MM-DD) the daily number belongs to.
+  numberDate      String
+  type            OrderType
+  tableLabel      String?
+  customerName    String
+  customerPhone   String?
+  note            String?
+  subtotalPaise   Int
+  totalPaise      Int
+  status          OrderStatus        @default(pending_payment)
+  paymentStatus   OrderPaymentStatus @default(unpaid)
+  // The ONE Razorpay order used for every payment attempt on this order.
+  razorpayOrderId String?            @unique
+  // Which captured payment paid this order (others are duplicates to refund).
+  paidPaymentId   String?
+  expiresAt       DateTime
+  paidAt          DateTime?
+  // A valid payment arrived after the order expired or was cancelled.
+  latePayment     Boolean            @default(false)
+  refundStatus    RefundStatus       @default(none)
+  refundedPaise   Int                @default(0)
+  // Set when staff open the order on the board, stops the new-order beep.
+  acknowledgedAt  DateTime?
+  cancelReason    String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  items           OrderItem[]
+  payments        Payment[]
+
+  @@unique([numberDate, dailyNumber])
+  @@index([status, paidAt])
+  @@index([createdAt])
+  @@index([customerPhone])
+}
+
+model OrderItem {
+  id          String    @id @default(cuid())
+  orderId     String
+  order       Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId  String?
+  menuItem    MenuItem? @relation(fields: [menuItemId], references: [id], onDelete: SetNull)
+  // Snapshots: later menu edits never change a past order.
+  nameSnapshot String
+  pricePaise  Int
+  isVeg       Boolean   @default(true)
+  quantity    Int
+
+  @@index([orderId])
+}
+
+enum PaymentStatus {
+  captured
+  failed
+  mismatch // amount or currency did not match the order; NOT counted as paid
+}
+
+// One row per Razorpay payment we have heard about. An order can have several
+// (failed attempts, then a captured one; rarely a duplicate capture).
+model Payment {
+  id                String        @id @default(cuid())
+  orderId           String?
+  order             Order?        @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  razorpayOrderId   String
+  razorpayPaymentId String        @unique
+  amountPaise       Int
+  currency          String        @default("INR")
+  status            PaymentStatus
+  method            String?
+  failureReason     String?
+  // Which path told us first: verify | webhook | reconcile
+  source            String
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([orderId])
+  @@index([razorpayOrderId])
+  @@index([status])
+}
+
+model WebhookEvent {
+  eventId     String    @id
+  type        String
+  receivedAt  DateTime  @default(now())
+  processedAt DateTime?
+}
+
+// Daily order numbers that restart at 1 every IST day.
+model DailyCounter {
+  date String @id // YYYY-MM-DD in Asia/Kolkata
+  next Int    @default(1)
+}
+
+// Single row (id = 1) of settings staff can change from /admin/settings.
+model Setting {
+  id                    Int       @id @default(1)
+  acceptingOrders       Boolean   @default(true)
+  bannerMessage         String    @default("")
+  lastReconcileAt       DateTime?
+  lastReconcileProblems Int       @default(0)
+  lastReconcileSummary  String    @default("")
+  updatedAt             DateTime  @updatedAt
+}
+
+model AdminUser {
+  id             String     @id @default(cuid())
+  email          String     @unique
+  passwordHash   String
+  // Bumped when the password is reset: old sessions stop working.
+  sessionVersion Int        @default(1)
+  lastLoginAt    DateTime?
+  createdAt      DateTime   @default(now())
+  auditLogs      AuditLog[]
+}
+
+model AuditLog {
+  id         String     @id @default(cuid())
+  adminId    String?
+  admin      AdminUser? @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  adminEmail String
+  action     String
+  entityType String
+  entityId   String?
+  oldValue   Json?
+  newValue   Json?
+  createdAt  DateTime   @default(now())
+
+  @@index([createdAt])
+}
+
+// Fixed-window rate limiter. key = "<name>:<subject>:<window index>".
+model RateLimit {
+  key       String   @id
+  count     Int      @default(0)
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}
+
+// Used ONLY by the mock payment gateway (RAZORPAY_MOCK=true) to play the part of
+// Razorpay's servers. Always empty in production.
+model MockGatewayPayment {
+  id              String   @id
+  razorpayOrderId String
+  amountPaise     Int
+  status          String
+  method          String   @default("upi")
+  createdAt       DateTime @default(now())
+
+  @@index([razorpayOrderId])
+}

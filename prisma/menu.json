@@ -1,0 +1,257 @@
+{
+  "categories": [
+    {
+      "key": "breakfast",
+      "name": "Breakfast",
+      "items": [
+        {
+          "key": "misal-pav",
+          "name": "Puneri Misal Pav",
+          "description": "Spicy sprouted moth bean curry with farsan, onion, lemon and two soft pavs.",
+          "price": "120",
+          "veg": true
+        },
+        {
+          "key": "poha",
+          "name": "Kanda Poha",
+          "description": "Flattened rice with onion, peanuts, curry leaves and fresh coconut.",
+          "price": "70",
+          "veg": true
+        },
+        {
+          "key": "sabudana-khichdi",
+          "name": "Sabudana Khichdi",
+          "description": "Sago pearls tossed with peanuts, green chilli and cumin. Served with curd.",
+          "price": "90",
+          "veg": true
+        },
+        {
+          "key": "upma",
+          "name": "Rava Upma",
+          "description": "Roasted semolina with vegetables, mustard seeds and ghee.",
+          "price": "70",
+          "veg": true
+        },
+        {
+          "key": "egg-bhurji-pav",
+          "name": "Egg Bhurji Pav",
+          "description": "Three eggs scrambled with onion, tomato and green chilli, with butter pav.",
+          "price": "110",
+          "veg": false
+        }
+      ]
+    },
+    {
+      "key": "thalis",
+      "name": "Thalis & Mains",
+      "items": [
+        {
+          "key": "maharashtrian-thali",
+          "name": "Maharashtrian Veg Thali",
+          "description": "Two sabzis, varan bhaat, amti, chapati, koshimbir, papad and a sweet.",
+          "price": "220",
+          "veg": true
+        },
+        {
+          "key": "chicken-thali",
+          "name": "Kolhapuri Chicken Thali",
+          "description": "Kolhapuri chicken with tambda and pandhra rassa, bhakri, rice and sol kadhi.",
+          "price": "320",
+          "veg": false
+        },
+        {
+          "key": "paneer-butter-masala",
+          "name": "Paneer Butter Masala",
+          "description": "Cottage cheese in a mild tomato and cashew gravy. Pair with roti or naan.",
+          "price": "240",
+          "veg": true
+        },
+        {
+          "key": "dal-tadka",
+          "name": "Dal Tadka",
+          "description": "Yellow lentils tempered with garlic, cumin and red chilli.",
+          "price": "160",
+          "veg": true
+        },
+        {
+          "key": "butter-roti",
+          "name": "Butter Roti",
+          "description": "Whole wheat roti from the tandoor, brushed with butter.",
+          "price": "30",
+          "veg": true
+        },
+        {
+          "key": "garlic-naan",
+          "name": "Garlic Naan",
+          "description": "Leavened bread with garlic and coriander.",
+          "price": "60",
+          "veg": true
+        }
+      ]
+    },
+    {
+      "key": "biryani",
+      "name": "Biryani & Rice",
+      "items": [
+        {
+          "key": "veg-dum-biryani",
+          "name": "Veg Dum Biryani",
+          "description": "Basmati rice slow-cooked with vegetables and whole spices. Served with raita.",
+          "price": "210",
+          "veg": true
+        },
+        {
+          "key": "chicken-dum-biryani",
+          "name": "Chicken Dum Biryani",
+          "description": "Hyderabadi-style dum biryani with tender chicken. Served with raita and salan.",
+          "price": "290",
+          "veg": false
+        },
+        {
+          "key": "mutton-biryani",
+          "name": "Mutton Biryani",
+          "description": "Slow-cooked goat biryani, our weekend special.",
+          "price": "380",
+          "veg": false,
+          "available": false
+        },
+        {
+          "key": "jeera-rice",
+          "name": "Jeera Rice",
+          "description": "Basmati rice tempered with cumin and ghee.",
+          "price": "120",
+          "veg": true
+        }
+      ]
+    },
+    {
+      "key": "south-indian",
+      "name": "South Indian",
+      "items": [
+        {
+          "key": "masala-dosa",
+          "name": "Masala Dosa",
+          "description": "Crisp rice crepe with spiced potato, sambar and two chutneys.",
+          "price": "130",
+          "veg": true
+        },
+        {
+          "key": "idli-sambar",
+          "name": "Idli Sambar (2 pcs)",
+          "description": "Steamed rice cakes with sambar and coconut chutney.",
+          "price": "80",
+          "veg": true
+        },
+        {
+          "key": "medu-vada",
+          "name": "Medu Vada (2 pcs)",
+          "description": "Crisp urad dal fritters with sambar and chutney.",
+          "price": "90",
+          "veg": true
+        }
+      ]
+    },
+    {
+      "key": "snacks",
+      "name": "Snacks",
+      "items": [
+        {
+          "key": "vada-pav",
+          "name": "Vada Pav",
+          "description": "Potato fritter in a pav with dry garlic chutney and fried green chilli.",
+          "price": "35",
+          "veg": true
+        },
+        {
+          "key": "pav-bhaji",
+          "name": "Pav Bhaji",
+          "description": "Buttery mashed vegetable curry with two toasted pavs, onion and lemon.",
+          "price": "150",
+          "veg": true
+        },
+        {
+          "key": "kothimbir-vadi",
+          "name": "Kothimbir Vadi",
+          "description": "Crisp coriander and gram flour squares with green chutney.",
+          "price": "100",
+          "veg": true
+        },
+        {
+          "key": "chicken-lollipop",
+          "name": "Chicken Lollipop (6 pcs)",
+          "description": "Fried chicken wings tossed in a spicy Schezwan glaze.",
+          "price": "240",
+          "veg": false
+        }
+      ]
+    },
+    {
+      "key": "desserts",
+      "name": "Desserts",
+      "items": [
+        {
+          "key": "puran-poli",
+          "name": "Puran Poli",
+          "description": "Sweet flatbread stuffed with chana dal and jaggery, served with ghee.",
+          "price": "80",
+          "veg": true
+        },
+        {
+          "key": "gulab-jamun",
+          "name": "Gulab Jamun (2 pcs)",
+          "description": "Warm milk dumplings in cardamom syrup.",
+          "price": "70",
+          "veg": true
+        },
+        {
+          "key": "shrikhand",
+          "name": "Kesar Shrikhand",
+          "description": "Strained curd with saffron, cardamom and pistachio.",
+          "price": "90",
+          "veg": true
+        }
+      ]
+    },
+    {
+      "key": "beverages",
+      "name": "Beverages",
+      "items": [
+        {
+          "key": "cutting-chai",
+          "name": "Cutting Chai",
+          "description": "Strong ginger and cardamom tea.",
+          "price": "20",
+          "veg": true
+        },
+        {
+          "key": "filter-coffee",
+          "name": "Filter Coffee",
+          "description": "South Indian decoction coffee with frothy milk.",
+          "price": "50",
+          "veg": true
+        },
+        {
+          "key": "sol-kadhi",
+          "name": "Sol Kadhi",
+          "description": "Kokum and coconut milk cooler.",
+          "price": "60",
+          "veg": true
+        },
+        {
+          "key": "masala-chaas",
+          "name": "Masala Chaas",
+          "description": "Spiced buttermilk with roasted cumin and coriander.",
+          "price": "45",
+          "veg": true
+        },
+        {
+          "key": "fresh-lime-soda",
+          "name": "Fresh Lime Soda",
+          "description": "Sweet, salted or mixed.",
+          "price": "70",
+          "veg": true
+        }
+      ]
+    }
+  ]
+}

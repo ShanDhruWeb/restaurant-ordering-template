@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: restaurant_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U test" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      # CI-only throwaway values. Real secrets never go in this file.
+      DATABASE_URL: postgresql://test:test@localhost:5432/not_used_in_ci
+      DIRECT_URL: postgresql://test:test@localhost:5432/not_used_in_ci
+      DATABASE_URL_TEST: postgresql://test:test@localhost:5432/restaurant_test
+      RAZORPAY_MOCK: "true"
+      SESSION_SECRET: ci-only-session-secret-0123456789abcdef
+      CRON_SECRET: ci-only-cron-secret-0123
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check

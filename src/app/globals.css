@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens. The values come from restaurant.config.ts (see src/config/themes.ts)
+ * and are set as --t-* CSS variables on <html> by src/app/layout.tsx.
+ * Tailwind's default palette is switched off so components can ONLY use these tokens.
+ */
+@theme {
+  --color-*: initial;
+  --font-*: initial;
+  --radius-*: initial;
+}
+
+@theme inline {
+  --color-bg: var(--t-bg);
+  --color-surface: var(--t-surface);
+  --color-ink: var(--t-text);
+  --color-muted: var(--t-muted);
+  --color-primary: var(--t-primary);
+  --color-on-primary: var(--t-primary-text);
+  --color-accent: var(--t-accent);
+  --color-success: var(--t-success);
+  --color-danger: var(--t-danger);
+  --color-line: color-mix(in srgb, var(--t-text) 14%, transparent);
+  --color-tint: color-mix(in srgb, var(--t-primary) 10%, var(--t-surface));
+  --color-shade: color-mix(in srgb, var(--t-text) 6%, var(--t-surface));
+  --color-overlay: color-mix(in srgb, var(--t-text) 45%, transparent);
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --radius-card: var(--t-radius);
+  --radius-pill: calc(var(--t-radius) * 3);
+  --radius-full: 9999px;
+
+  --font-heading: var(--t-font-heading), ui-serif, Georgia, serif;
+  --font-body: var(--t-font-body), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--t-bg);
+  color: var(--t-text);
+  font-family: var(--font-body);
+  min-height: 100dvh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+}
+
+:focus-visible {
+  outline: 3px solid var(--t-primary);
+  outline-offset: 2px;
+}
+
+/* Safe-area helpers for phones with notches and home bars. */
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--color-shade) 25%, var(--color-line) 50%, var(--color-shade) 75%);
+  background-size: 200% 100%;
+  animation: skeleton 1.4s ease-in-out infinite;
+}
+@keyframes skeleton {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Printing: only the kitchen ticket. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
+}

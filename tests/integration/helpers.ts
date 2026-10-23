@@ -53,6 +53,7 @@ export function orderInput(
     type: "takeaway" as const,
     customerName: "Asha Patil",
     customerPhone: "9876543210",
+    termsAccepted: true,
     items,
     ...extra,
   };

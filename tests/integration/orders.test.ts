@@ -34,6 +34,33 @@ describeDb("POST /api/orders", () => {
     expect(order.expiresAt.getTime() - order.createdAt.getTime()).toBeGreaterThan(14 * 60_000);
   });
 
+  it("records when the customer agreed to the policies", async () => {
+    const before = Date.now();
+    const res = await post(orderInput([{ menuItemId: items.thali.id, quantity: 1 }]));
+    expect(res.status).toBe(201);
+    const order = await prisma.order.findUniqueOrThrow({ where: { id: (await res.json()).id } });
+    expect(order.termsAcceptedAt).not.toBeNull();
+    expect(order.termsAcceptedAt!.getTime()).toBeGreaterThanOrEqual(before - 1000);
+  });
+
+  it.each([undefined, false, "true", 1, null])("rejects consent value %s and creates no order", async (v) => {
+    const res = await post(
+      orderInput([{ menuItemId: items.thali.id, quantity: 1 }], { termsAccepted: v as boolean }),
+    );
+    expect(res.status).toBe(400);
+    if (v === undefined || v === false) expect((await res.json()).code).toBe("consent_required");
+    expect(await prisma.order.count()).toBe(0);
+  });
+
+  it("does not expose the consent time on the public order", async () => {
+    const res = await post(orderInput([{ menuItemId: items.thali.id, quantity: 1 }]));
+    const { id } = await res.json();
+    const pub = await (
+      await getRoute(new Request(`http://localhost:3000/api/orders/${id}`), routeParams(id))
+    ).json();
+    expect(JSON.stringify(pub)).not.toMatch(/termsAccepted/);
+  });
+
   it.each([0, -1, 1.5, 99, "1"])("rejects quantity %s with 400", async (quantity) => {
     const res = await post(orderInput([{ menuItemId: items.thali.id, quantity: quantity as number }]));
     expect(res.status).toBe(400);

@@ -32,6 +32,8 @@ export const createOrderSchema = z
       .min(1, "Your cart is empty")
       .max(config.ordering.maxItemsPerOrder),
     expectedTotalPaise: z.number().int().nonnegative().optional(),
+    // Must be exactly true. Checked in createOrder so the customer gets a clear message.
+    termsAccepted: z.boolean().optional(),
   })
   .strict();
 
@@ -53,6 +55,14 @@ export function freshCart(cart: PricedCart) {
 }
 
 export async function createOrder(input: CreateOrderInput, now = new Date()) {
+  // Consent comes first: no order is created without it, whatever the client does.
+  if (input.termsAccepted !== true) {
+    throw new HttpError(
+      400,
+      "Please agree to the Terms and Conditions, Privacy Policy and Cancellation and Refund Policy.",
+      "consent_required",
+    );
+  }
   // Business rules the schema cannot express.
   if (!config.ordering.types.includes(input.type)) {
     throw new HttpError(400, "That order type is not available.", "invalid_type");
@@ -132,6 +142,7 @@ export async function createOrder(input: CreateOrderInput, now = new Date()) {
             subtotalPaise: cart.subtotalPaise,
             totalPaise: cart.totalPaise,
             expiresAt,
+            termsAcceptedAt: now,
             items: {
               create: cart.lines.map((l) => ({
                 menuItemId: l.menuItemId,

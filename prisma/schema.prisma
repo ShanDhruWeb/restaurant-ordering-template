@@ -98,6 +98,9 @@ model Order {
   refundedPaise   Int                @default(0)
   // Set when staff open the order on the board, stops the new-order beep.
   acknowledgedAt  DateTime?
+  // When the customer ticked "I agree to the Terms, Privacy and Refund policies". Null on
+  // orders created before this field existed.
+  termsAcceptedAt DateTime?
   cancelReason    String?
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt

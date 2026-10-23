@@ -18,6 +18,7 @@ interface Props {
   notesEnabled: boolean;
   taxNote: string;
   maxQtyPerItem: number;
+  seller: { legalName: string; address: string; phone: string };
 }
 
 const NOTE_MAX = 200;
@@ -38,12 +39,21 @@ function validPhone(input: string): boolean {
   return /^[6-9]\d{9}$/.test(d);
 }
 
-export function CheckoutForm({ types, tables, requirePhone, notesEnabled, taxNote, maxQtyPerItem }: Props) {
+export function CheckoutForm({
+  types,
+  tables,
+  requirePhone,
+  notesEnabled,
+  taxNote,
+  maxQtyPerItem,
+  seller,
+}: Props) {
   const cart = useCart();
   const router = useRouter();
   const { pay, mockSheet } = usePayment();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [message, setMessage] = useState<{ tone: "error" | "info"; text: string } | null>(null);
   const [stage, setStage] = useState<"idle" | "placing" | "paying">("idle");
@@ -132,6 +142,7 @@ export function CheckoutForm({ types, tables, requirePhone, notesEnabled, taxNot
     e.preventDefault();
     if (stage !== "idle") return;
     setMessage(null);
+    if (!agreed) return setMessage({ tone: "error", text: strings.checkout.consentRequired });
     if (!validate()) return;
     sessionStorage.setItem("contact:v1", JSON.stringify({ name: name.trim(), phone: phone.trim() }));
 
@@ -160,6 +171,7 @@ export function CheckoutForm({ types, tables, requirePhone, notesEnabled, taxNot
             note: notesEnabled && cart.note.trim() ? cart.note : undefined,
             items: cart.lines.map((l) => ({ menuItemId: l.menuItemId, quantity: l.quantity })),
             expectedTotalPaise: cart.totalPaise,
+            termsAccepted: agreed,
           },
         },
       );
@@ -169,6 +181,8 @@ export function CheckoutForm({ types, tables, requirePhone, notesEnabled, taxNot
         if (res.data.code === "restaurant_closed")
           return setMessage({ tone: "error", text: strings.checkout.closed });
         if (res.data.code === "invalid_phone") return setErrors({ phone: strings.checkout.phoneInvalid });
+        if (res.data.code === "consent_required")
+          return setMessage({ tone: "error", text: strings.checkout.consentRequired });
         if (res.networkError) return setMessage({ tone: "error", text: strings.checkout.networkError });
         if (res.status === 429) return setMessage({ tone: "error", text: strings.checkout.rateLimited });
         return setMessage({ tone: "error", text: res.data.error ?? strings.checkout.genericError });
@@ -246,6 +260,17 @@ export function CheckoutForm({ types, tables, requirePhone, notesEnabled, taxNot
             <span>{formatRupees(cart.totalPaise)}</span>
           </div>
           <p className="mt-1 text-xs text-muted">{taxNote}</p>
+          <p className="mt-3 border-t border-line pt-3 text-sm">
+            <span className="font-semibold">{strings.checkout.orderTypeLine}: </span>
+            {orderType === "dine_in"
+              ? `${strings.common.dineIn}${cart.table ? `, ${strings.common.table(cart.table)}` : ""}`
+              : orderType === "takeaway"
+                ? strings.common.takeaway
+                : "-"}
+          </p>
+          <p className="mt-2 text-xs text-muted">
+            {strings.checkout.soldBy(seller.legalName, seller.address, seller.phone)}
+          </p>
         </section>
 
         <fieldset className="space-y-4">
@@ -366,10 +391,36 @@ export function CheckoutForm({ types, tables, requirePhone, notesEnabled, taxNot
           </p>
         )}
 
+        <div className="rounded-card border border-line bg-surface p-3">
+          <label className="flex items-start gap-3">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              className="mt-0.5 h-6 w-6 shrink-0 accent-primary"
+            />
+            <span className="text-sm">
+              {strings.checkout.consentPrefix}{" "}
+              <a href="/terms" target="_blank" rel="noopener" className="font-semibold underline">
+                {strings.checkout.consentTerms}
+              </a>
+              ,{" "}
+              <a href="/privacy" target="_blank" rel="noopener" className="font-semibold underline">
+                {strings.checkout.consentPrivacy}
+              </a>{" "}
+              and{" "}
+              <a href="/refunds" target="_blank" rel="noopener" className="font-semibold underline">
+                {strings.checkout.consentRefunds}
+              </a>
+              .
+            </span>
+          </label>
+        </div>
+
         <div className="pb-safe sticky bottom-0 -mx-4 border-t border-line bg-bg px-4 pt-3">
           <button
             type="submit"
-            disabled={stage !== "idle"}
+            disabled={stage !== "idle" || !agreed}
             className="h-14 w-full rounded-pill bg-primary text-lg font-bold text-on-primary shadow-lg disabled:opacity-60"
           >
             {busyLabel ?? strings.checkout.pay(formatRupees(cart.totalPaise))}
